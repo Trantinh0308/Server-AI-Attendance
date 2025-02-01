@@ -40,6 +40,7 @@ def send_attendance_request(name, img, current_time):
 
         payload = {
             "employeeId": name,
+            "attendanceDevice":"camera",
             "imageCode": img_base64,
             "date": current_time.strftime("%Y-%m-%d"),
             "time": current_time.strftime("%H:%M:%S")
