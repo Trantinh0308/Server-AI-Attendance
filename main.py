@@ -10,7 +10,7 @@ from flask_cors import CORS
 import websockets
 import asyncio
 import base64
-from utils import findEncodings, load_training_images, send_attendance_request
+from utils import findEncodings, load_training_images, send_attendance_request, send_control_device
 
 app = Flask(__name__)
 CORS(app)
@@ -49,7 +49,7 @@ async def video_stream(websocket):
     cap = cv2.VideoCapture(0)  
 
     if not cap.isOpened():
-        print("Error: Could not open camera.")
+        await websocket.send("Không tìm thấy camera.")  
         await websocket.close()
         return
     
@@ -97,8 +97,10 @@ async def video_stream(websocket):
             frame_counter += 1  
             if frame_counter >= 4:
                 handle_request_with_delay(name, img, current_time)
+                send_control_device(True)
                 frame_counter = 0 
-            
+        else :  
+            send_control_device(False)   
         ret, jpeg = cv2.imencode('.jpg', img)
         frame = base64.b64encode(jpeg.tobytes()).decode('utf-8')
 

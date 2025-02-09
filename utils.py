@@ -5,6 +5,8 @@ import base64
 import requests
 
 ATTENDANCE_URL = 'http://localhost:8686/api/attendance'
+CONTROL_SERVER_UI_URL = 'http://localhost:8686/api/door'
+DOOR_STATUS_URL = 'http://localhost:8686/api/door/status'
 
 def load_training_images(imagesPath):
     images = []  
@@ -56,4 +58,9 @@ def send_attendance_request(name, img, current_time):
     except requests.exceptions.RequestException as e:
         print("Error sending request:", e)
 
-
+def send_control_device(open_status):
+    try:
+        requests.post(CONTROL_SERVER_UI_URL, params={'open': open_status})
+        requests.post(DOOR_STATUS_URL, params={'open': open_status})
+    except requests.exceptions.RequestException as e:
+        print(f"Request failed: {str(e)}")

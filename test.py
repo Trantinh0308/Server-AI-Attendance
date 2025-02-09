@@ -10,7 +10,7 @@ from flask_cors import CORS
 import websockets
 import asyncio
 import base64
-from utils import findEncodings, load_training_images, send_attendance_request
+from utils import findEncodings, load_training_images, send_attendance_request, send_control_device
 
 app = Flask(__name__)
 CORS(app)
@@ -93,12 +93,14 @@ async def video_stream(websocket):
             cv2.putText(img, f'id = {name}', (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 0.7, (255, 255, 255), 2)
             cv2.putText(img, f'Accuracy: {accuracy:.2f}%', (x1 + 6, y2 + 10), cv2.FONT_HERSHEY_COMPLEX, 0.7, (255, 255, 255), 2)
 
-        if face_detected and name != "Unknown":
+        if face_detected and name != "Unknown" :
             frame_counter += 1  
             if frame_counter >= 4:
                 handle_request_with_delay(name, img, current_time)
+                send_control_device(True)
                 frame_counter = 0 
-            
+        else :  
+            send_control_device(False)
         ret, jpeg = cv2.imencode('.jpg', img)
         frame = base64.b64encode(jpeg.tobytes()).decode('utf-8')
 
